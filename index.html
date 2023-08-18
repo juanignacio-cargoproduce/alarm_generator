@@ -225,9 +225,9 @@
                 } else if (key === "bccs") {
                     // Agregar los valores de Bcc a la lista
                     bccs.push(value);
-                } else if (!key.includes("LanguageSettings")) {
+                }/* else if (!key.includes("LanguageSettings")) {
                     jsonData[key] = value;
-                }
+                }*/
             });
 
             jsonData.emailsTo = emailsTo;
