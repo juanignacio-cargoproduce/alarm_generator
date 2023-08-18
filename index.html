@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de JSON</title>
+    <!-- Agrega el enlace al CSS de Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body onload="pageLoaded()">
+    <div class="container mt-4">
+        <h1>Generador de JSON</h1>
+        <form id="jsonForm">
+            <div class="form-group">
+                <label for="valor">Cargo Produce Customer ID:</label>
+                <select class="form-control" id="valor" name="cargoProduceCustomerId" required>
+                    <option value="77">First Quantum</option>
+                    <option value="30">Fiordo</option>
+                    <!-- Agrega más opciones aquí -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="alertType">Tipo de Alarma:</label>
+                        <select class="form-control" id="alertType" name="alertType" onchange="updateAlarmTypes()"
+                            required>
+                            <option value="report">Reporte</option>
+                            <option value="event">Evento</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="alarmType">Tipo de Alarma Específico:</label>
+                        <select class="form-control" id="alarmType" name="alarmType" required>
+                            <!-- Opciones generadas dinámicamente según la selección -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emailContainer" class="form-group">
+                <label>Emails To:</label>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <select class="form-control" name="languageCode" required>
+                            <option value="es-ES">Español</option>
+                            <option value="en-US">Inglés</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="email" class="form-control" name="emailAddress" value="juani@example.com" required>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger" onclick="removeField(this)">X</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emailContainer" class="form-group">
+                <!-- Aquí se agregarán dinámicamente los campos de correo -->
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="addEmailField()">Agregar Email</button>
+
+
+
+            <div id="bccContainer" class="form-group">
+                <label>Bcc:</label>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <input type="email" class="form-control" name="bccs" value="example@gmail.com">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger" onclick="removeField(this)">X</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addBccField()">Agregar Bcc</button>
+
+
+
+            <div class="form-group">
+                <label>Configuración de Idioma:</label>
+                <div id="languageSettingsContainer">
+                    <!-- Aquí se agregarán los campos de configuración de idioma -->
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addLanguageSetting()">Agregar Configuración de
+                    Idioma</button>
+            </div>
+
+
+
+            <button type="button" class="btn btn-success mt-2" onclick="generateJSON()">Generar JSON</button>
+        </form>
+
+        <pre id="jsonOutput" class="mt-4"></pre>
+    </div>
+
+    <!-- Agrega el enlace al archivo JavaScript de Bootstrap y tu archivo de manejo de tipos de alarma -->
+    <!-- Agrega aquí tus enlaces a los archivos JS -->
+    <script>
+
+        function pageLoaded() {
+            updateAlarmTypes(); // Llamar a la función para completar el campo alarmType
+        }
+
+        // Debes implementar la lógica para obtener los tipos de alarma según la selección
+        function updateAlarmTypes() {
+            const selectedType = document.getElementById("alertType").value;
+            const alarmTypeSelect = document.getElementById("alarmType");
+
+            alarmTypeSelect.innerHTML = ''; // Limpiar opciones actuales
+
+            if (selectedType === "event") {
+                const eventTypes = ["EarlyOrDelayedArrivalEvent", "EarlyOrDelayedDepartureEvent", "ContainersDepartureEvent"];
+                eventTypes.forEach(event => {
+                    alarmTypeSelect.add(new Option(event));
+                });
+            }
+
+            if (selectedType === "report") {
+                const eventTypes = ["EarlyOrDelayedArrival", "EarlyOrDelayedDeparture", "NearToDepart"];
+                eventTypes.forEach(event => {
+                    alarmTypeSelect.add(new Option(event));
+                });
+            }
+        }
+
+        // Agregar campos de correo electrónico y lenguaje dinámicamente
+        function addEmailField() {
+            const emailContainer = document.getElementById("emailContainer");
+            const emailDiv = document.createElement("div");
+            emailDiv.className = "row mt-2";
+            emailDiv.innerHTML = `
+    <div class="col-md-6">
+      <select class="form-control" name="languageCode" required>
+        <option value="es-ES">Español</option>
+        <option value="en-US">Inglés</option>
+      </select>
+    </div>
+    <div class="col-md-5">
+      <input type="email" class="form-control" name="emailAddress" placeholder="Correo electrónico" required>
+    </div>
+    <div class="col-md-1">
+      <button type="button" class="btn btn-danger" onclick="removeField(this)">X</button>
+    </div>
+  `;
+            emailContainer.appendChild(emailDiv);
+        }
+
+        // Agregar campos de Bcc dinámicamente
+        function addBccField() {
+            const bccContainer = document.getElementById("bccContainer");
+            const bccDiv = document.createElement("div");
+            bccDiv.className = "row mt-2";
+            bccDiv.innerHTML = `
+                <div class="col-md-6">
+                <input type="email" class="form-control" name="bccs" placeholder="Bcc" value="example@gmail.com">
+                </div>
+                <div class="col-md-2">
+                <button type="button" class="btn btn-danger" onclick="removeField(this)">X</button>
+                </div>
+            `;
+            bccContainer.appendChild(bccDiv);
+        }
+
+        // Función para eliminar un campo
+        function removeField(button) {
+            const fieldRow = button.closest(".row");
+            fieldRow.remove();
+        }
+
+        function addLanguageSetting() {
+            const languageSettingsContainer = document.getElementById("languageSettingsContainer");
+            const languageSettingDiv = document.createElement("div");
+            languageSettingDiv.className = "language-setting row mt-3";
+            languageSettingDiv.innerHTML = `
+    <div class="col-md-12">
+      <label>Configuración de Idioma:</label>
+    </div>
+    <div class="col-md-3">
+      <select class="form-control" name="languageCodeLanguageSettings" required>
+        <option value="es-ES">Español</option>
+        <option value="en-US">Inglés</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-control" name="htmlTemplate" required>
+        <option value="template-alert-without-red-siren.html">Alert Without Red Siren</option>
+        <option value="template-alert-without-header.html">Alert Without Header</option>
+        <option value="template-base-coffee-alert.html">Base Coffee Alert</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" name="headerImageUrl" value="https://cargoproduce-assets.s3.us-west-2.amazonaws.com/header-alfaberries.png">
+    </div>
+    <div class="col-md-3">
+      <input type="text" class="form-control" name="subject" value="Toc, toc! ✊ Alfaberries, hay algo que necesita tu atención...">
+    </div>
+    <div class="col-md-12 mt-2">
+      <button type="button" class="btn btn-danger" onclick="removeField(this)">X</button>
+    </div>
+  `;
+            languageSettingsContainer.appendChild(languageSettingDiv);
+        }
+
+
+        // Generar el JSON final
+        function generateJSON() {
+            const formData = new FormData(document.getElementById("jsonForm"));
+            const jsonData = {};
+            const emailsTo = [];
+            const bccs = [];
+
+            formData.forEach((value, key) => {
+                if (key === "languageCode") {
+                    const emailObject = { languageCode: value };
+                    const emailAddress = formData.get("emailAddress");
+                    emailObject.emailAddress = emailAddress;
+                    emailsTo.push(emailObject);
+                } else if (key === "emailAddress") {
+                    // Omitir el manejo de emailAddress aquí, ya se maneja en el bloque anterior
+                } else if (key === "bccs") {
+                    // Agregar los valores de Bcc a la lista
+                    bccs.push(value);
+                } else if (!key.includes("LanguageSettings")) {
+                    jsonData[key] = value;
+                }
+            });
+
+            jsonData.emailsTo = emailsTo;
+            jsonData.bccs = bccs; // Agregar la propiedad Bccs al JSON
+
+            // Obtener y agregar la configuración de idioma solo si existe al menos un bloque de configuración
+            const languageSettingDivs = document.querySelectorAll(".language-setting");
+            if (languageSettingDivs.length > 0) {
+                const languageSettings = [];
+                languageSettingDivs.forEach((languageSettingDiv) => {
+                    const languageSetting = {
+                        languageCode: languageSettingDiv.querySelector("[name=languageCodeLanguageSettings]").value,
+                        htmlTemplate: languageSettingDiv.querySelector("[name=htmlTemplate]").value,
+                        headerImageUrl: languageSettingDiv.querySelector("[name=headerImageUrl]").value,
+                        subject: languageSettingDiv.querySelector("[name=subject]").value,
+                    };
+                    languageSettings.push(languageSetting);
+                });
+                jsonData.languageSettings = languageSettings;
+            }
+
+            document.getElementById("jsonOutput").textContent = JSON.stringify(jsonData, null, 2);
+        }
+    </script>
+</body>
+
+</html>
